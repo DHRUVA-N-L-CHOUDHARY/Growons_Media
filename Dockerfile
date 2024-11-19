@@ -14,7 +14,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN yarn run build
+RUN yarn run build npx prisma generate 
 
 FROM base AS runner
 WORKDIR /app
