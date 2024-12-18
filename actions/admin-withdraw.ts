@@ -49,7 +49,7 @@ export const acceptWithdrawal = async (formData: FormData) => {
       return { error: "Failed to upload screenshot to Cloudinary." };
     }
 
-    await db.withdrawalRequest.update({
+    const withdrawal_updation = await db.withdrawalRequest.update({
       where: { id: requestId },
       data: {
         status: "SUCCESS",
@@ -63,12 +63,13 @@ export const acceptWithdrawal = async (formData: FormData) => {
       where: { id: requestId },
     });
 
-    await db.walletFlow.create({
+    const walletFlow_creation = await db.walletFlow.create({
       data: {
         amount: Number(withdrawalRequest?.withdrawAmount),
         moneyId: transactionId,
         purpose: "Withdraw Request",
         userId: userId,
+        status: "SUCCESS",
       },
     });
 
@@ -84,12 +85,19 @@ export const acceptWithdrawal = async (formData: FormData) => {
         });
       }
     }
+
+    await Promise.all([
+      withdrawalRequest,
+      walletFlow_creation,
+      withdrawal_updation,
+    ]);
   } catch (error) {
     console.error("Error in acceptWithdrawal:", error);
     return { error: "Error while accepting the withdrawal request!" };
   }
 
   revalidatePath("/admin/withdrawals");
+  revalidatePath("/admin/user/");
   return { success: "Withdrawal request accepted!" };
 };
 

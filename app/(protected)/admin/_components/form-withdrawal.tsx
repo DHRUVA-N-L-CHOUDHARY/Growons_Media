@@ -32,7 +32,6 @@ type FormWithdrawalProps = {
   userId: string;
 };
 
-
 const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
   const [isPending, startTransition] = useTransition();
 
@@ -58,7 +57,6 @@ const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
     formData.append("requestId", requestId);
     formData.append("userId", userId);
     formData.append("transactionId", values.transactionId);
-    
 
     for (const field of Object.keys(values) as Array<keyof typeof values>) {
       if (field === "image") {
@@ -70,6 +68,7 @@ const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
 
     startTransition(() => {
       acceptWithdrawal(formData).then((data) => {
+        window.location.reload();
         if (data?.success) {
           toast.success(data.success);
           acceptForm.reset();
@@ -86,9 +85,10 @@ const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
   ) => {
     startTransition(() => {
       rejectWithdrawal({
-        id : requestId,
+        id: requestId,
         reason: values.reason,
       }).then((data) => {
+        window.location.reload();
         if (data?.success) {
           toast.success(data.success);
           rejectForm.reset();
@@ -135,24 +135,24 @@ const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
                 )}
               />
               <FormField
-              control={acceptForm.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Attach the screenshot below:</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete="off"
-                      disabled={isPending}
-                      placeholder="Attach the screenshot here"
-                      type="file"
-                      {...acceptForm.register("image")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                control={acceptForm.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attach the screenshot below:</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="off"
+                        disabled={isPending}
+                        placeholder="Attach the screenshot here"
+                        type="file"
+                        {...acceptForm.register("image")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button
                   type="submit"

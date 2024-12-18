@@ -10,6 +10,7 @@ export const LoginSchema = z.object({
   password: z.string().min(6, {
     message: "Minimum of 6 characters required",
   }),
+  acceptTerms: z.string().optional(),
 });
 
 export const RegisterSchema = z
@@ -40,6 +41,7 @@ export const RegisterSchema = z
     confirmPassword: z.string().min(6, {
       message: "Minimum of 6 characters required",
     }),
+    acceptTerms: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -463,6 +465,7 @@ export const FeedbackFileSchema = z.object({
 
 export const AcceptOrderSchema = z.object({
   id: z.string(),
+  orderId: z.string(),
   files: z
     .array(
       z
@@ -501,6 +504,7 @@ export const RejectOrderSchema = z.object({
   id: z.string(),
   reason: z.string().min(10, { message: "Minimum of 10 characters required" }),
   userId: z.string(),
+  orderId: z.string(),
   amount: z.coerce.number(),
 });
 

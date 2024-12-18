@@ -20,6 +20,45 @@ export const RequestWithdrawal = async (formData: FormData) => {
       };
     }
 
+    const walletFlow = await db.walletFlow.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    const calculateTotalMoney = walletFlow.reduce((acc, flow) => {
+      const amount =
+        flow.purpose?.toLowerCase() === "wallet recharge"
+          ? flow.status === "SUCCESS"
+            ? Math.abs(flow.amount)
+            : 0
+          : flow.purpose?.toLowerCase() === "admin"
+          ? flow.status === "SUCCESS"
+            ? Math.abs(flow.amount)
+            : 0
+          : flow.status === "SUCCESS" || flow.status === "PENDING"
+          ? -Math.abs(flow.amount)
+          : 0;
+
+      return acc + amount;
+    }, 0);
+
+    const isAmountMatching = calculateTotalMoney === user?.totalMoney;
+
+    if (!isAmountMatching) {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          role: "BLOCKED",
+          totalMoney: calculateTotalMoney,
+        },
+      });
+
+      return {
+        error: "You have been blocked by the admin. contact admin know more",
+      };
+    }
+
     const withdrawAmount = formData.get("withdrawAmount")?.toString() ?? "0";
     if (user.totalMoney < parseInt(withdrawAmount, 10)) {
       return { error: "Insufficient funds for withdrawal" };
@@ -46,6 +85,5 @@ export const RequestWithdrawal = async (formData: FormData) => {
   }
 
   revalidatePath("/withdrawals/record");
-
   return { success: "Withdrawal request submitted!" };
 };

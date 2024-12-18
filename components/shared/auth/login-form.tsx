@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/shared/form-error";
 import { login } from "@/actions/login";
 import CardWrapper from "./card-wrapper";
+import TermsAndConditionsDialog from "./terms_conditions";
+import PrivacyPolicyDialog from "./privacy_policy";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -29,6 +31,7 @@ export const LoginForm = () => {
     defaultValues: {
       username: "",
       password: "",
+      acceptTerms : "",
     },
   });
 
@@ -82,6 +85,30 @@ export const LoginForm = () => {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="acceptTerms"
+              render={({ field }) => (
+                <FormItem className="flex items-start space-x-2">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      id="acceptTerms"
+                      disabled={isPending}
+                      {...field}
+                      className="w-4 h-4 mt-4 rounded border border-input text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <label
+                    htmlFor="acceptTerms"
+                    className="text-sm text-muted-foreground"
+                  >
+                    I have read all <TermsAndConditionsDialog /> and accept the{" "}
+                    <PrivacyPolicyDialog /> of the company.
+                  </label>
                 </FormItem>
               )}
             />

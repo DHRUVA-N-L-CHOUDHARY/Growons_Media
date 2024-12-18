@@ -3,7 +3,7 @@ import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { LoginSchema } from "@/schemas";
-import { getUserByEmail, getUserByNumber } from "@/data/user";
+import { getUserByEmail} from "@/data/user";
 
 export default {
   providers: [
@@ -18,10 +18,6 @@ export default {
 
           if (username.includes("@")) {
             user = await getUserByEmail(username);
-          }
-
-          if (username.length === 10) {
-            user = await getUserByNumber(username);
           }
 
           if (!user || !user.password) return null;

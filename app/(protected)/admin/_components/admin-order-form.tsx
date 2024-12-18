@@ -30,12 +30,19 @@ import { acceptOrder, rejectOrder } from "@/actions/admin-order";
 
 type InvoiceProps = {
   id: string;
+  orderId: string;
   userId: string;
   amount: number;
   products: any;
 };
 
-const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
+const AdminOrderForm = ({
+  id,
+  orderId,
+  amount,
+  userId,
+  products,
+}: InvoiceProps) => {
   const [isPending, startTransition] = useTransition();
 
   const rejectForm = useForm<z.infer<typeof RejectOrderSchema>>({
@@ -43,6 +50,7 @@ const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
     defaultValues: {
       id: id,
       reason: "",
+      orderId: orderId,
       userId: userId,
       amount: amount,
     },
@@ -52,12 +60,14 @@ const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
     resolver: zodResolver(AcceptOrderSchema),
     defaultValues: {
       id: id,
+      orderId: orderId,
       files: undefined,
     },
   });
   const handleAccept = async (values: z.infer<typeof AcceptOrderSchema>) => {
     const formData = new FormData();
     formData.append("id", values.id);
+    formData.append("orderId", values.orderId);
 
     startTransition(async () => {
       try {
@@ -82,7 +92,7 @@ const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
             console.log(`Fetching file for quantity: ${productQuantity}`);
 
             const response = await fetch(
-              `https://idp-panel.as.r.appspot.com/api/download-leads?productname=${productName}&numofLines=${productQuantity}`
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}api/download-leads?productname=${productName}&numofLines=${productQuantity}`
             );
 
             if (!response.ok) {
@@ -103,6 +113,7 @@ const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
         }
 
         const data = await acceptOrder(formData);
+        window.location.reload();
 
         if (data?.success) {
           toast.success(data.success, {
@@ -135,6 +146,7 @@ const AdminOrderForm = ({ id, amount, userId, products }: InvoiceProps) => {
   const handleReject = async (values: z.infer<typeof RejectOrderSchema>) => {
     startTransition(() => {
       rejectOrder(values).then((data) => {
+        window.location.reload();
         if (data?.success) {
           toast.success(data.success, {
             action: {
