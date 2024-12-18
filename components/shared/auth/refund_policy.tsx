@@ -32,7 +32,7 @@ const RefundPolicyDialog = () => {
             </h2>
             <DialogDescription>
               We aim to ensure our clients are completely satisfied with our
-              services. If you're not entirely happy, we're here to make things
+              services. If you&apos;re not entirely happy, we&apos;re here to make things
               right.
             </DialogDescription>
           </section>

@@ -22,16 +22,16 @@ const ContactUsDialog = () => {
             Contact Us
           </DialogTitle>
           <DialogDescription>
-            <strong>Let’s Connect and Grow Together!</strong>
+            <strong>Let&apos;s Connect and Grow Together!</strong>
           </DialogDescription>
         </DialogHeader>
         <section className="space-y-6 mt-4">
           <section className="space-y-4">
             <h2 className="text-xl font-semibold text-primary">Introduction:</h2>
             <p>
-              At GrowOns Media, we’re always here to help your business thrive.
+              At GrowOns Media, we&apos;re always here to help your business thrive.
               Whether you have questions, need more details about our services,
-              or are ready to get started, we’d love to hear from you.
+              or are ready to get started, we&apos;d love to hear from you.
             </p>
           </section>
           <section className="space-y-4">
