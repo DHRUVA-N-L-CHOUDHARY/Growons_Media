@@ -13,7 +13,7 @@ import {
 const TermsAndConditionsDialog = () => {
   return (
     <Dialog>
-      <DialogTrigger className="text-primary underline cursor-pointer">
+      <DialogTrigger className="text-sm font-medium hover:text-primary transition-colors underline cursor-pointer">
         Terms & Conditions
       </DialogTrigger>
       <DialogContent>

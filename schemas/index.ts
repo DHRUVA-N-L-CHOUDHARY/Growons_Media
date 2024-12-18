@@ -10,7 +10,6 @@ export const LoginSchema = z.object({
   password: z.string().min(6, {
     message: "Minimum of 6 characters required",
   }),
-  acceptTerms: z.string().optional(),
 });
 
 export const RegisterSchema = z
@@ -41,7 +40,6 @@ export const RegisterSchema = z
     confirmPassword: z.string().min(6, {
       message: "Minimum of 6 characters required",
     }),
-    acceptTerms: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

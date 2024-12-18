@@ -13,8 +13,8 @@ import {
 const PrivacyPolicyDialog = () => {
   return (
     <Dialog>
-      <DialogTrigger className="text-primary underline cursor-pointer">
-        policy
+      <DialogTrigger className="text-sm font-medium hover:text-primary transition-colors underline cursor-pointer">
+        Privacy Policy
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
