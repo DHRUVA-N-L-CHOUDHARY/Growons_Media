@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/shared/form-error";
 import { login } from "@/actions/login";
 import CardWrapper from "./card-wrapper";
+import TermsAndConditionsDialog from "./terms_conditions";
+import PrivacyPolicyDialog from "./privacy_policy";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");

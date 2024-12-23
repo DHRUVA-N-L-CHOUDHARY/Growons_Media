@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { AdminSidebar, SidebarItems } from "./NavBarItems";
+import { AdminSidebar, SidebarItems, SupportPolicies } from "./NavBarItems";
 import { auth } from "@/auth";
 
 const NavItems = async () => {
@@ -29,19 +29,10 @@ const NavItems = async () => {
               </span>
             </Link>
           </li>
+
           <li>
             <Link
-              href={`/withdraw/record/${session?.user?.id}`}
-              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 "
-            >
-              <span className="flex-1 ms-3 whitespace-nowrap">
-                Request Withdrawal
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={`/orders/${session?.user.id}`}
+              href={`/orders/products/${session?.user.id}`}
               className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100"
             >
               <span className="flex-1 ms-3 whitespace-nowrap">
@@ -55,7 +46,7 @@ const NavItems = async () => {
               className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100"
             >
               <span className="flex-1 ms-3 whitespace-nowrap">
-                Order status
+                Download Leads
               </span>
             </Link>
           </li>
@@ -75,6 +66,17 @@ const NavItems = async () => {
               <span className="flex-1 ms-3 whitespace-nowrap">Feedback</span>
             </Link>
           </li>
+          <li>
+            <Link
+              href={`/withdraw/record/${session?.user?.id}`}
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 "
+            >
+              <span className="flex-1 ms-3 whitespace-nowrap">
+                Request Withdrawal
+              </span>
+            </Link>
+          </li>
+          <SupportPolicies />
         </>
       )}
       {session?.user.role === "ADMIN" && <AdminSidebar />}

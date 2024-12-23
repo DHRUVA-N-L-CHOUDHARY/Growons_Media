@@ -101,8 +101,9 @@ const AdminOrders = async ({
                     <AdminOrderForm
                       userId={order.userId}
                       id={order.id}
+                      orderId={order.orderId}
                       amount={order.amount}
-                      products = {products}
+                      products={products}
                     />
                   </TableCell>
                 </TableRow>

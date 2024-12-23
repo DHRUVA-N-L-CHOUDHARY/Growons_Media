@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/shared/auth/login-form";
+import Footer from "@/components/shared/footer";
 
 export const generateMetadata = () => {
   return {
@@ -8,7 +9,14 @@ export const generateMetadata = () => {
 };
 
 const LoginPage = () => {
-  return <LoginForm />;
+  return (
+    <div className="flex flex-col min-h-screen">
+       <main className="flex-grow flex items-center justify-center py-10">
+        <LoginForm />
+       </main> 
+       <Footer /> 
+    </div>
+  );
 };
 
 export default LoginPage;

@@ -266,7 +266,6 @@ export const AcceptWithdrawalSchema = z.object({
 });
 
 export const RejectWithdrawalSchema = z.object({
-  id: z.string(),
   reason: z.string().min(10, { message: "Minimum of 10 characters required" }),
 });
 
@@ -463,6 +462,7 @@ export const FeedbackFileSchema = z.object({
 
 export const AcceptOrderSchema = z.object({
   id: z.string(),
+  orderId: z.string(),
   files: z
     .array(
       z
@@ -501,6 +501,7 @@ export const RejectOrderSchema = z.object({
   id: z.string(),
   reason: z.string().min(10, { message: "Minimum of 10 characters required" }),
   userId: z.string(),
+  orderId: z.string(),
   amount: z.coerce.number(),
 });
 
@@ -658,4 +659,9 @@ export const AddSupportLinkForm = z.object({
   link: z.string().includes("https://").min(1, {
     message: "Please enter the support link",
   }),
+});
+
+export const AutomationStateSchema = z.object({
+  newState: z.boolean(),
+  userId: z.string().nonempty("User ID is required"),
 });

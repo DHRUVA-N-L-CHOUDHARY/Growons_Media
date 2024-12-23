@@ -39,6 +39,7 @@ export const AddMoney = async (formData: FormData) => {
   const photos = await uploadPhotosToCloudinary(file);
 
   const user = await getUserById(formData.get("userId")?.toString() ?? "");
+  const userId = formData.get("userId")?.toString();
   const username = user?.name;
   const transactionId = formData.get("transactionId")?.toString() ?? "";
 
@@ -53,12 +54,51 @@ export const AddMoney = async (formData: FormData) => {
   }
 
   try {
+    console.log(user?.id);
     if (user?.role === "BLOCKED") {
       return {
         error: "You have been blocked by the admin. contact admin know more",
       };
     }
 
+    const walletFlow = await db.walletFlow.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    const calculateTotalMoney = walletFlow.reduce((acc, flow) => {
+      const amount =
+        flow.purpose?.toLowerCase() === "wallet recharge"
+          ? flow.status === "SUCCESS"
+            ? Math.abs(flow.amount)
+            : 0
+          : flow.purpose?.toLowerCase() === "admin"
+          ? flow.status === "SUCCESS"
+            ? Math.abs(flow.amount)
+            : 0
+          : flow.status === "SUCCESS" || flow.status === "PENDING"
+          ? -Math.abs(flow.amount)
+          : 0;
+
+      return acc + amount;
+    }, 0);
+
+    const isAmountMatching = calculateTotalMoney === user?.totalMoney;
+
+    if (!isAmountMatching) {
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          role: "BLOCKED",
+          totalMoney: calculateTotalMoney,
+        },
+      });
+
+      return {
+        error: "You have been blocked by the admin. contact admin know more",
+      };
+    }
     await db.money.create({
       data: {
         amount: formData.get("amount")?.toString(),
@@ -67,7 +107,7 @@ export const AddMoney = async (formData: FormData) => {
         transactionId: formData.get("transactionId")?.toString() ?? "",
         upiid: formData.get("upiid")?.toString() ?? "",
         accountNumber: formData.get("accountNumber")?.toString(),
-        userId: formData.get("userId")?.toString(),
+        userId: userId,
         name: username ?? "",
       },
     });
@@ -77,7 +117,8 @@ export const AddMoney = async (formData: FormData) => {
         amount: Number(formData.get("amount")),
         moneyId: formData.get("transactionId") as string,
         purpose: "Wallet recharge",
-        userId: formData.get("userId") as string,
+        userId: userId as string,
+        status: "PENDING",
       },
     });
   } catch (err: any) {
@@ -86,6 +127,5 @@ export const AddMoney = async (formData: FormData) => {
   }
 
   revalidatePath("/money/record");
-
   return { success: "Money added!" };
 };

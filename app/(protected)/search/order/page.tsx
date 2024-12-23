@@ -131,6 +131,7 @@ const SearchOrder = async ({
                     <AdminOrderForm
                       userId={order.userId}
                       id={order.id}
+                      orderId={order.orderId}
                       amount={order.amount}
                       products={products}
                     />

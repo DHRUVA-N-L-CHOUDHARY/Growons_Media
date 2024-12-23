@@ -24,15 +24,12 @@ const FileDialog = ({ files, status }: { files: Order[]; status: string }) => {
   return (
     <Dialog>
       <DialogTrigger>Download</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="mb-2">Your orders:</DialogTitle>
           {files.map((file, index) => {
             return (
               <div key={index} className="flex flex-row items-center">
-                <p className="capitalize font-bold">
-                  {file.fileName.split(".")[0]}
-                </p>
                 <FileDownload
                   secure_url={file.secure_url}
                   fileName={file.fileName}

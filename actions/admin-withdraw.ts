@@ -49,7 +49,7 @@ export const acceptWithdrawal = async (formData: FormData) => {
       return { error: "Failed to upload screenshot to Cloudinary." };
     }
 
-    await db.withdrawalRequest.update({
+    const withdrawal_updation = await db.withdrawalRequest.update({
       where: { id: requestId },
       data: {
         status: "SUCCESS",
@@ -63,12 +63,13 @@ export const acceptWithdrawal = async (formData: FormData) => {
       where: { id: requestId },
     });
 
-    await db.walletFlow.create({
+    const walletFlow_creation = await db.walletFlow.create({
       data: {
         amount: Number(withdrawalRequest?.withdrawAmount),
         moneyId: transactionId,
         purpose: "Withdraw Request",
         userId: userId,
+        status: "SUCCESS",
       },
     });
 
@@ -84,22 +85,29 @@ export const acceptWithdrawal = async (formData: FormData) => {
         });
       }
     }
+
+    await Promise.all([
+      withdrawalRequest,
+      walletFlow_creation,
+      withdrawal_updation,
+    ]);
   } catch (error) {
     console.error("Error in acceptWithdrawal:", error);
     return { error: "Error while accepting the withdrawal request!" };
   }
 
   revalidatePath("/admin/withdrawals");
+  revalidatePath("/admin/user/");
   return { success: "Withdrawal request accepted!" };
 };
 
-export const rejectWithdrawal = async (
-  values: z.infer<typeof RejectWithdrawalSchema>
-) => {
+export const rejectWithdrawal = async (formData: FormData) => {
+  const requestId = formData.get("id")?.toString() || "";
+  const reason = formData.get("reason")?.toString() || "";
   try {
     await db.withdrawalRequest.update({
-      where: { id: values.id },
-      data: { status: "FAILED", reason: values.reason },
+      where: { id: requestId },
+      data: { status: "FAILED", reason: reason },
     });
   } catch (error) {
     console.error("Error in rejectWithdrawal:", error);
@@ -107,5 +115,6 @@ export const rejectWithdrawal = async (
   }
 
   revalidatePath("/admin/withdrawals");
+  revalidatePath("/admin/user/");
   return { success: "Withdrawal request rejected!" };
 };
