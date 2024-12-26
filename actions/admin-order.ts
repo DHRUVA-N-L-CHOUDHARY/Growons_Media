@@ -140,9 +140,11 @@ async function uploadFilestoCloudinary(buffer: string[]) {
 export const acceptOrder = async (formData: FormData) => {
   const filesBase64 = await convertFilesToBase64(formData);
   const files = await uploadFilestoCloudinary(filesBase64);
+  const id = formData.get("id")?.toString();
+  const orderId = formData.get("orderId")?.toString();
   try {
-    await db.order.update({
-      where: { id: formData.get("id")?.toString() },
+    const order_updation = await db.order.update({
+      where: { id: id },
       data: {
         status: "SUCCESS",
         files: files.map((file, index) => ({
@@ -153,6 +155,15 @@ export const acceptOrder = async (formData: FormData) => {
         })),
       },
     });
+
+    const walletflow_updation = await db.walletFlow.update({
+      where: { moneyId: orderId },
+      data: {
+        status: "SUCCESS",
+      },
+    });
+
+    await Promise.all([order_updation, walletflow_updation]);
   } catch (error) {
     console.log(error);
     return { error: "Error while accepting the order!" };

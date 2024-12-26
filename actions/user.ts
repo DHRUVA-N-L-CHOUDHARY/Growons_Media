@@ -165,12 +165,23 @@ export const updateMoney = async (
 
     const moneyId = Date.now() + Math.floor(Math.random() * 100000);
 
+    
+    await db.walletFlow.updateMany({
+      where: {
+        userId: userId,
+      },
+      data: {
+        status: "TERMINATED",
+      },
+    });
+    
     await db.walletFlow.create({
       data: {
         userId: userId,
         moneyId: moneyId.toString().slice(-11),
         amount: amount || 0,
         purpose: "ADMIN",
+        status: "SUCCESS",
       },
     });
   } catch (error) {

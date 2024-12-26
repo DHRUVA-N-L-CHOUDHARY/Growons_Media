@@ -1,15 +1,18 @@
+"use server";
+
+import { db } from "@/lib/db";
+import { AutomationStateSchema } from "@/schemas";
+import { z } from "zod";
+
 export const fetchAutomationState = async (): Promise<boolean> => {
   try {
-    const response = await fetch(
-      `https://gmedia-leads-panel.uc.r.appspot.com/api/automatic-status`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch automation state");
+    const setting = await db.settings.findFirst({});
+
+    if (!setting) {
+      throw new Error("Settings document not found");
     }
 
-    const data = await response.json();
-    console.log(data);
-    return data.automaticVariable;
+    return setting.automaticVariable;
   } catch (error) {
     console.error("Error fetching automation state:", error);
     return false;
@@ -17,32 +20,39 @@ export const fetchAutomationState = async (): Promise<boolean> => {
 };
 
 export const updateAutomationState = async (
-  newState: boolean
-): Promise<boolean> => {
-  try {
-    console.log(newState);
-    const response = await fetch(
-      `https://gmedia-leads-panel.uc.r.appspot.com/api/toggle-automatic`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ automaticVariable: newState }),
-      }
-    );
+  values: z.infer<typeof AutomationStateSchema>
+) => {
+  const validatedFields = AutomationStateSchema.safeParse(values);
 
-    if (!response.ok) {
-      throw new Error("Failed to update automation state");
+  if (!validatedFields.success) {
+    return { error: "Invalid fields!" };
+  }
+
+  const { newState, userId } = validatedFields.data;
+
+  try {
+    const existingRecord = await db.settings.findFirst();
+
+    if (existingRecord) {
+      await db.settings.update({
+        where: { id: existingRecord.id },
+        data: { automaticVariable: newState },
+      });
+      return {
+        success: true,
+        message: "Automation state updated successfully.",
+      };
+    } else {
+      await db.settings.create({
+        data: { automaticVariable: newState, userId },
+      });
+      return {
+        success: true,
+        message: "Automation state created successfully.",
+      };
     }
-    const data = await response.json();
-    console.log(data);
-    if (response.ok) {
-      return true;
-    }
-    return false;
   } catch (error) {
     console.error("Error updating automation state:", error);
-    return false;
+    return { success: false, message: "Internal server error." };
   }
 };

@@ -5,6 +5,7 @@ import BalanceCard from "./_components/BalanceCard";
 import BankDetails from "./_components/bank-details";
 import SupportLink from "./_components/support-link";
 import AdminAutomateOrders from "./_components/admin-automateOrders";
+import AdminUpdateStocks from "./_components/update-stocks";
 export default async function Home() {
   const session = await auth();
 
@@ -21,7 +22,10 @@ export default async function Home() {
         <div className="flex flex-wrap">
           {session?.user.role !== "ADMIN" && <BalanceCard />}
           {session?.user.role === "ADMIN" && <BankDetails />}
-          {session?.user.role === "ADMIN" && <AdminAutomateOrders />}
+          {session?.user.role === "ADMIN" && (
+            <AdminAutomateOrders userId={session.user.id ?? ""} />
+          )}
+          {session?.user.role === "ADMIN" && <AdminUpdateStocks />}
           {session?.user.role === "ADMIN" && <SupportLink />}
         </div>
       </div>

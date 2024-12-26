@@ -56,27 +56,32 @@ const AddMoneyForm = ({ bankDetails, userId }: AddMoneyFormProps) => {
 
   function onSubmit(values: z.infer<typeof MoneySchema>) {
     const formData = new FormData();
-    formData.append("userId", userId);
-
-    for (const field of Object.keys(values) as Array<keyof typeof values>) {
-      if (field === "image") {
-        formData.append("image", values[field]);
-      } else {
-        formData.append(`${field}`, `${values[field]}`);
-      }
-    }
 
     startTransition(() => {
-      AddMoney(formData).then((data) => {
-        if (data?.success) {
-          toast.success(data?.success);
-          form.reset();
-          window.location.reload();
+      try {
+        formData.append("userId", userId);
+
+        for (const field of Object.keys(values) as Array<keyof typeof values>) {
+          if (field === "image") {
+            formData.append("image", values[field]);
+          } else {
+            formData.append(`${field}`, `${values[field]}`);
+          }
         }
-        if (data?.error) {
-          toast.error(data?.error);
-        }
-      });
+        AddMoney(formData).then((data) => {
+          if (data?.success) {
+            toast.success(data?.success);
+            form.reset();
+            window.location.reload();
+          }
+          if (data?.error) {
+            toast.error(data?.error);
+          }
+        });
+      } catch (e) {
+        console.log(e);
+        toast.error("an error occurred. please try again later");
+      }
     });
   }
   return (

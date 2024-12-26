@@ -22,7 +22,16 @@ const PaginationBar = ({ currentPage, totalPages }: PaginationBarProps) => {
   for (let page = minPage; page <= maxPage; page++) {
     numberedPageItems.push(
       <PaginationItem key={page}>
-        <PaginationLink href={"?page=" + page}>{page}</PaginationLink>
+        <PaginationLink
+          href={"?page=" + page}
+          className={`px-3 py-1 rounded-lg ${
+            page === currentPage
+              ? "bg-black text-white"
+              : "text-black"
+          }`}
+        >
+          {page}
+        </PaginationLink>
       </PaginationItem>
     );
   }

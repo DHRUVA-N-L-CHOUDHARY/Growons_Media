@@ -1,5 +1,6 @@
 import RegisterForm from "@/components/shared/auth/register-form";
 import React from "react";
+import Footer from "@/components/shared/footer";
 
 export const generateMetadata = () => {
   return {
@@ -10,9 +11,12 @@ export const generateMetadata = () => {
 
 const page = () => {
   return (
-    <>
-      <RegisterForm />
-    </>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-grow container flex flex-col items-center justify-center">
+        <RegisterForm />
+      </main>
+      <Footer />
+    </div>
   );
 };
 
