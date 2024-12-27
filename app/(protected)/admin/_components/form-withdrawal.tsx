@@ -84,10 +84,10 @@ const FormWithdrawal = ({ requestId, userId }: FormWithdrawalProps) => {
     values: z.infer<typeof RejectWithdrawalSchema>
   ) => {
     startTransition(() => {
-      rejectWithdrawal({
-        id: requestId,
-        reason: values.reason,
-      }).then((data) => {
+      const formData = new FormData();
+      formData.append("id", requestId);
+      formData.append("reason", values.reason);
+      rejectWithdrawal(formData).then((data) => {
         window.location.reload();
         if (data?.success) {
           toast.success(data.success);

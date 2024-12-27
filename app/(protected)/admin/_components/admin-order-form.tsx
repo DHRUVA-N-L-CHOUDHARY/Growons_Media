@@ -27,6 +27,7 @@ import * as z from "zod";
 import { AcceptOrderSchema, RejectOrderSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { acceptOrder, rejectOrder } from "@/actions/admin-order";
+import { downloadLeads } from "@/actions/download-leads";
 
 type InvoiceProps = {
   id: string;
@@ -91,9 +92,7 @@ const AdminOrderForm = ({
             console.log(`Fetching file for product: ${productName}`);
             console.log(`Fetching file for quantity: ${productQuantity}`);
 
-            const response = await fetch(
-              `${process.env.NEXT_PUBLIC_BACKEND_URL}api/download-leads?productname=${productName}&numofLines=${productQuantity}`
-            );
+            const response = await downloadLeads(productName, productQuantity)
 
             if (!response.ok) {
               throw new Error(
@@ -101,7 +100,7 @@ const AdminOrderForm = ({
               );
             }
 
-            const blob = await response.blob();
+            const blob = new Blob([response.data],{type:response.contentType})
             const file = new File([blob], `${productName}_leads.csv`, {
               type: blob.type,
             });

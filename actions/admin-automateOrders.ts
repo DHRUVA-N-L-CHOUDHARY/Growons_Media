@@ -1,48 +1,58 @@
-  export const fetchAutomationState = async (): Promise<boolean> => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}api/automatic-status`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch automation state");
-      }
+"use server";
 
-      const data = await response.json();
-      console.log(data);
-      return data.automaticVariable;
-    } catch (error) {
-      console.error("Error fetching automation state:", error);
-      return false;
+import { db } from "@/lib/db";
+import { AutomationStateSchema } from "@/schemas";
+import { z } from "zod";
+
+export const fetchAutomationState = async (): Promise<boolean> => {
+  try {
+    const setting = await db.settings.findFirst({});
+
+    if (!setting) {
+      throw new Error("Settings document not found");
     }
-  };
 
-  export const updateAutomationState = async (
-    newState: boolean
-  ): Promise<boolean> => {
-    try {
-      console.log(newState);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}api/toggle-automatic`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ automaticVariable: newState }),
-        }
-      );
+    return setting.automaticVariable;
+  } catch (error) {
+    console.error("Error fetching automation state:", error);
+    return false;
+  }
+};
 
-      if (!response.ok) {
-        throw new Error("Failed to update automation state");
-      }
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error updating automation state:", error);
-      return false;
+export const updateAutomationState = async (
+  values: z.infer<typeof AutomationStateSchema>
+) => {
+  const validatedFields = AutomationStateSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return { error: "Invalid fields!" };
+  }
+
+  const { newState, userId } = validatedFields.data;
+
+  try {
+    const existingRecord = await db.settings.findFirst();
+
+    if (existingRecord) {
+      await db.settings.update({
+        where: { id: existingRecord.id },
+        data: { automaticVariable: newState },
+      });
+      return {
+        success: true,
+        message: "Automation state updated successfully.",
+      };
+    } else {
+      await db.settings.create({
+        data: { automaticVariable: newState, userId },
+      });
+      return {
+        success: true,
+        message: "Automation state created successfully.",
+      };
     }
-  };
+  } catch (error) {
+    console.error("Error updating automation state:", error);
+    return { success: false, message: "Internal server error." };
+  }
+};

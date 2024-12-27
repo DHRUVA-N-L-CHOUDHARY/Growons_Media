@@ -101,13 +101,13 @@ export const acceptWithdrawal = async (formData: FormData) => {
   return { success: "Withdrawal request accepted!" };
 };
 
-export const rejectWithdrawal = async (
-  values: z.infer<typeof RejectWithdrawalSchema>
-) => {
+export const rejectWithdrawal = async (formData: FormData) => {
+  const requestId = formData.get("id")?.toString() || "";
+  const reason = formData.get("reason")?.toString() || "";
   try {
     await db.withdrawalRequest.update({
-      where: { id: values.id },
-      data: { status: "FAILED", reason: values.reason },
+      where: { id: requestId },
+      data: { status: "FAILED", reason: reason },
     });
   } catch (error) {
     console.error("Error in rejectWithdrawal:", error);
@@ -115,5 +115,6 @@ export const rejectWithdrawal = async (
   }
 
   revalidatePath("/admin/withdrawals");
+  revalidatePath("/admin/user/");
   return { success: "Withdrawal request rejected!" };
 };
