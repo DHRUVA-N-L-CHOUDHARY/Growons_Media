@@ -29,7 +29,7 @@ const ContactUsDialog = () => {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold text-primary">Introduction:</h2>
             <p>
-              At GrowOns Media, we&apos;re always here to help your business thrive.
+              At GrowOns Media, we&apos;e always here to help your business thrive.
               Whether you have questions, need more details about our services,
               or are ready to get started, we&apos;d love to hear from you.
             </p>
