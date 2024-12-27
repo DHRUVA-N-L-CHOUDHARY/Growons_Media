@@ -28,6 +28,13 @@ import BlockUser from "../../_components/block-user";
 import { editUser } from "@/actions/user";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type User = {
   id: string;
@@ -36,6 +43,7 @@ type User = {
   number: string;
   password: string;
   totalMoney: number;
+  paymentType: "MANUAL" | "PAYMENT_GATEWAY";
   role: "ADMIN" | "PRO" | "BLOCKED" | "USER";
   createdAt: Date;
 };
@@ -54,6 +62,7 @@ const EditUser: React.FC<EditUserProps> = ({ user }) => {
       name: user.name || "",
       email: user.email,
       number: user.number,
+      paymentType: user.paymentType || "MANUAL",
     },
   });
 
@@ -132,6 +141,48 @@ const EditUser: React.FC<EditUserProps> = ({ user }) => {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="paymentType"
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    onValueChange={field.onChange}
+                    disabled={user.role === "BLOCKED" || isPending}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Payment Type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <FormMessage />
+                    <SelectContent>
+                      {[
+                        {
+                          key: "PAYMENT_GATEWAY",
+                          value: "Payment Gateway",
+                        },
+                        {
+                          key: "MANUAL",
+                          value: "Manual",
+                        },
+                      ].map((product) => {
+                        return (
+                          <SelectItem
+                            value={product.value}
+                            key={product.key}
+                            className="capitalize"
+                          >
+                            {product.value}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />

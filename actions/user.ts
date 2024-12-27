@@ -93,7 +93,7 @@ export const editUser = async (values: z.infer<typeof EditUserSchema>) => {
     return { error: "Invalid Fields" };
   }
 
-  const { id, name, number, email } = validatedFields.data;
+  const { id, name, number, email, paymentType } = validatedFields.data;
 
   const existingUser = await db.user.findFirst({
     where: {
@@ -121,6 +121,8 @@ export const editUser = async (values: z.infer<typeof EditUserSchema>) => {
         name: name,
         number: number,
         email: email,
+        paymentType:
+          paymentType === "PAYMENT GATEWAY" ? "PAYMENT_GATEWAY" : "MANUAL",
       },
     });
   } catch (error) {
@@ -165,7 +167,6 @@ export const updateMoney = async (
 
     const moneyId = Date.now() + Math.floor(Math.random() * 100000);
 
-    
     await db.walletFlow.updateMany({
       where: {
         userId: userId,
@@ -174,7 +175,7 @@ export const updateMoney = async (
         status: "TERMINATED",
       },
     });
-    
+
     await db.walletFlow.create({
       data: {
         userId: userId,

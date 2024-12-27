@@ -14,6 +14,11 @@ enum UserRole {
   PRO
 }
 
+enum PaymentType {
+  MANUAL
+  PAYMENT_GATEWAY
+}
+
 enum MoneyStatus {
   PENDING
   SUCCESS
@@ -48,6 +53,7 @@ model User {
   totalMoney        Int                 @default(0)
   role              UserRole            @default(USER)
   createdAt         DateTime            @default(now()) @map("created_at")
+  paymentType       PaymentType         @default(MANUAL)
   money             Money[]
   withdrawalRequest WithdrawalRequest[]
   Order             Order[]
@@ -210,4 +216,14 @@ model News {
   updatedAt DateTime @updatedAt
   User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
+}
+
+
+model PaymentMetaData {
+  id            String     @id @default(uuid()) @map("_id")
+  authToken     String   
+  usersTypeTag  UserRole   @default(USER)
+  createdAt     DateTime   @default(now()) @map("created_at") 
+  updatedAt     DateTime   @updatedAt 
+  expiry        DateTime   
 }

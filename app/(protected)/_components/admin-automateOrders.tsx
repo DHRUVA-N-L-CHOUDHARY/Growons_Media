@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface AdminAutomateOrdersProps {
-  userId: string; // Expect userId as a prop
+  userId: string; 
 }
 const AdminAutomateOrders: React.FC<AdminAutomateOrdersProps> = ({
   userId,

@@ -22,7 +22,7 @@ import Search from "@/components/shared/search";
 export const generateMetadata = () => {
   return {
     title: "Admin Orders History | GrowonsMedia",
-    description: "Admin Wallet",
+    description: "Admin Orders",
   };
 };
 
@@ -46,7 +46,7 @@ const AdminWallet = async ({ searchParams }: AdminHistoryProps) => {
   return (
     <section className="my-2">
       <nav className="hidden md:block">
-        <TopBar title="Admin Wallet" />
+        <TopBar title="Admin Orders" />
       </nav>
       <div className="m-1 p-1">
         <Search fileName="order-history" />

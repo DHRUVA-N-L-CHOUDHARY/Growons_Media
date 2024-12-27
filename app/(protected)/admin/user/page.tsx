@@ -57,6 +57,7 @@ const UserTable = async ({
             <TableHead>UserName</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Wallet</TableHead>
+            <TableHead>Payment Type</TableHead>
             <TableHead>Joined on</TableHead>
             <TableHead colSpan={2}>
               <Search fileName={"user-management"} />
@@ -67,7 +68,7 @@ const UserTable = async ({
           <TableFooter>
             <TableRow>
               <TableCell colSpan={6} className="text-center">
-                No invoices found
+                No users found
               </TableCell>
             </TableRow>
           </TableFooter>
@@ -82,6 +83,11 @@ const UserTable = async ({
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 <BalanceCell id={user.id} />
+              </TableCell>
+              <TableCell>
+                {user.paymentType === "PAYMENT_GATEWAY"
+                  ? "Payment Gateway"
+                  : "Manual"}
               </TableCell>
               <TableCell>{user.createdAt.toDateString()}</TableCell>
               <TableCell>

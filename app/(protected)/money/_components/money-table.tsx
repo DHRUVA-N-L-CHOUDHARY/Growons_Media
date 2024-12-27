@@ -83,7 +83,13 @@ export async function MoneyTable({ userId, searchParams }: TableProps) {
                   )}
                 </TableCell>
                 <TableCell>
-                  <ImageDialog imageLink={invoice.secure_url} />
+                  <ImageDialog
+                    imageLink={
+                      invoice.secure_url === "PayGIC Payment Gateway"
+                        ? "/svgs/logo.webp"
+                        : invoice.secure_url
+                    }
+                  />
                 </TableCell>
                 <TableCell>{invoice.createdAt.toDateString()}</TableCell>
               </TableRow>
