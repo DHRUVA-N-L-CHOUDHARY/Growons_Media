@@ -107,6 +107,7 @@ const PaymentGateway = ({
 
     try {
       setIsPending(true);
+      console.log(merchantReferenceId);
       await checkPaymentStatus(merchantReferenceId, userId).then((data) => {
         if (data?.success) {
           toast.success(data?.success);
@@ -254,7 +255,7 @@ const PaymentGateway = ({
                 </Form>
               </section>
             </div>
-            {isCheckStatusEnabled == false && (
+            {isCheckStatusEnabled  && (
               <div className="md:w-[50%]">
                 <MobilePaymentGateway
                   paymentOptions={paymentOptions}

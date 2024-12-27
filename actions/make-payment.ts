@@ -131,13 +131,13 @@ export const createPaymentRequest = async (formData: FormData) => {
       return { error: "Failed to create payment request. Please try again." };
     }
 
-    const { intent, gpay, paytm, phonePe, dynamicQR, paygicReferenceId } =
+    const { intent, gpay, paytm, phonePe, dynamicQR, merchantReferenceId } =
       paymentResponse.data;
 
     return {
       success: "Payment request created. Please complete the payment.",
       paymentLinks: { intent, gpay, paytm, phonePe, dynamicQR },
-      merchantReferenceId: paygicReferenceId,
+      merchantReferenceId: merchantReferenceId,
     };
   } catch (error: any) {
     console.error("Error:", error.message);
@@ -260,6 +260,9 @@ export const checkPaymentStatus = async (
     );
 
     const { status, statusCode, txnStatus, msg, data } = response.data;
+
+    console.log(status);
+    console.log(statusCode);
 
     if (!status || statusCode !== 200) {
       if (statusCode === 300) {

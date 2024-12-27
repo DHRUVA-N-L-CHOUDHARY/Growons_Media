@@ -3,6 +3,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -16,6 +17,7 @@ import DownloadToExcel from "../_components/download-to-excel";
 import ProductToExcel from "../_components/product-to-excel";
 import { revalidatePath } from "next/cache";
 import Search from "@/components/shared/search";
+import PaginationBar from "@/app/(protected)/money/_components/PaginationBar";
 
 const ProductAnalytics = async ({
   searchParams,
@@ -25,15 +27,30 @@ const ProductAnalytics = async ({
   const currentPage = parseInt(searchParams.page) || 1;
   const pageSize = 9;
   const startDate = searchParams.startDate || new Date("1983-01-01");
-  const endDate = searchParams.endDate || new Date();
+  const endDate = searchParams.endDate
+    ? new Date(
+        new Date(searchParams.endDate).setDate(
+          new Date(searchParams.endDate).getDate() + 1
+        )
+      )
+    : new Date(new Date().setDate(new Date().getDate() + 1));
 
-  const totalItemCount = await db.order.count();
+  const totalItemCount = await db.product.count();
   const totalPages = Math.ceil(totalItemCount / pageSize);
 
   const products = await db.product.findMany({
     orderBy: {
       createdAt: "desc",
     },
+    skip: (currentPage - 1) * pageSize,
+    take: pageSize,
+  });
+  const exportProducts = await db.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    skip: (currentPage - 1) * pageSize,
+    take: pageSize,
   });
   const orders = await db.order.findMany({
     where: {
@@ -46,8 +63,6 @@ const ProductAnalytics = async ({
     orderBy: {
       createdAt: "desc",
     },
-    skip: (currentPage - 1) * pageSize,
-    take: pageSize,
   });
 
   revalidatePath("/admin/analytics/product");
@@ -56,7 +71,7 @@ const ProductAnalytics = async ({
     <section className="m-2">
       <div className="flex items-center justify-between gap-x-2 p-1 md:hidden">
         <ProductToExcel
-          products={JSON.parse(JSON.stringify(products))}
+          products={JSON.parse(JSON.stringify(exportProducts))}
           orders={JSON.parse(JSON.stringify(orders))}
           fileName={"Products"}
         />
@@ -65,7 +80,7 @@ const ProductAnalytics = async ({
       <div className="md:flex md:items-center md:justify-between md:gap-x-2">
         <div className="hidden md:flex items-center justify-between  gap-x-3">
           <ProductToExcel
-            products={JSON.parse(JSON.stringify(products))}
+            products={JSON.parse(JSON.stringify(exportProducts))}
             orders={JSON.parse(JSON.stringify(orders))}
             fileName={"Products"}
           />
@@ -111,6 +126,9 @@ const ProductAnalytics = async ({
           ))}
         </TableBody>
       </Table>
+      {totalPages > 1 && (
+        <PaginationBar totalPages={totalPages} currentPage={currentPage} />
+      )}
     </section>
   );
 };
