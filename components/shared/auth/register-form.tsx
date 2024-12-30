@@ -19,6 +19,8 @@ import CardWrapper from "./card-wrapper";
 import { FormSuccess } from "@/components/shared/form-success";
 import { register } from "@/actions/register";
 import { useRouter } from "next/navigation";
+import TermsAndConditionsDialog from "./terms_conditions";
+import PrivacyPolicyDialog from "./privacy_policy";
 
 const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");

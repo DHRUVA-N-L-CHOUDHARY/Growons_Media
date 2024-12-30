@@ -84,7 +84,7 @@ const SearchOrderHistory = async ({
         <TableFooter>
           <TableRow>
             <TableCell className="text-center" colSpan={8}>
-              No invoices found
+              No orders found
             </TableCell>
           </TableRow>
           <TableRow>

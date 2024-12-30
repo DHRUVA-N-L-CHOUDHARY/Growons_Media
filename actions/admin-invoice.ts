@@ -23,6 +23,7 @@ export const acceptInvoice = async ({ userId, invoiceId }: ValuesProps) => {
       },
       select: {
         amount: true,
+        transactionId: true
       },
     });
 
@@ -41,6 +42,13 @@ export const acceptInvoice = async ({ userId, invoiceId }: ValuesProps) => {
       where: { id: userId },
       data: {
         totalMoney: totalMoney + updatedMoney,
+      },
+    });
+
+    await db.walletFlow.update({
+      where: { moneyId: money?.transactionId },
+      data: {
+        status: "SUCCESS",
       },
     });
   } catch (error) {
@@ -62,9 +70,26 @@ export const rejectInvoice = async (
     return { error: "Invalid fields!!" };
   }
   try {
+    const money = await db.money.findUnique({
+      where: {
+        id: values.id,
+      },
+      select: {
+        amount: true,
+        transactionId: true
+      },
+    });
+
     await db.money.update({
       where: { id: values.id },
       data: { status: "FAILED", reason: values.reason },
+    });
+
+    await db.walletFlow.update({
+      where: { moneyId: money?.transactionId },
+      data: {
+        status: "FAILED",
+      },
     });
   } catch (error) {
     return { error: "Error while rejecting the Invoice!" };

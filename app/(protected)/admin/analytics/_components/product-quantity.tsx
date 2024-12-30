@@ -24,18 +24,19 @@ type ProductProps = {
 
 const ProductQuantity = ({ orders, productName }: ProductProps) => {
   const quantitySold = orders.reduce((acc, order) => {
-    const quantityProduct = order.products.find((product) => {
-      return product.name === productName;
-    });
-    if (quantityProduct) {
-      return acc + quantityProduct.quantity;
+    if (order.status === "SUCCESS") {
+      const quantityProduct = order.products.find((product) => {
+        return product.name === productName;
+      });
+      if (quantityProduct) {
+        return acc + quantityProduct.quantity;
+      }
     }
     return acc;
   }, 0);
+
 
   return <span className="text-center">{quantitySold}</span>;
 };
 
 export default ProductQuantity;
-
-

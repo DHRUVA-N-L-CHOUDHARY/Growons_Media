@@ -1,8 +1,8 @@
 import React from "react";
-import OrderForm from "../../_components/order-form";
+import OrderForm from "../../../_components/order-form";
 import { db } from "@/lib/db";
-import TopBar from "../../_components/Topbar";
-import ProductOrderTable from "../../_components/product-order-table";
+import TopBar from "../../../_components/Topbar";
+import ProductOrderTable from "../../../_components/product-order-table";
 
 export const generateMetadata = () => {
   return {

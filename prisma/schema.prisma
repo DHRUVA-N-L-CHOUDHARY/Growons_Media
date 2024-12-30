@@ -14,10 +14,22 @@ enum UserRole {
   PRO
 }
 
+enum PaymentType {
+  MANUAL
+  PAYMENT_GATEWAY
+}
+
 enum MoneyStatus {
   PENDING
   SUCCESS
   FAILED
+}
+
+enum WalletFlowStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  TERMINATED
 }
 
 enum RequestStatus {
@@ -35,12 +47,13 @@ enum OrderStatus {
 model User {
   id                String              @id @default(uuid()) @map("_id")
   email             String              @unique
-  name              String              @unique
-  number            String              @unique
+  name              String
+  number            String
   password          String
   totalMoney        Int                 @default(0)
   role              UserRole            @default(USER)
   createdAt         DateTime            @default(now()) @map("created_at")
+  paymentType       PaymentType         @default(MANUAL)
   money             Money[]
   withdrawalRequest WithdrawalRequest[]
   Order             Order[]
@@ -51,6 +64,16 @@ model User {
   BankDetails       BankDetails[]
   WalletFlow        WalletFlow[]
   Support           Support[]
+  Settings          Settings[]
+}
+
+model Settings {
+  id                String   @id @default(uuid()) @map("_id")
+  automaticVariable Boolean
+  userId            String
+  User              User     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt
 }
 
 model BankDetails {
@@ -115,14 +138,15 @@ model WithdrawalRequest {
 }
 
 model WalletFlow {
-  id        String   @id @default(uuid()) @map("_id")
-  moneyId   String   @unique
+  id        String           @id @default(uuid()) @map("_id")
+  moneyId   String           @unique
   userId    String
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?            @relation(fields: [userId], references: [id])
   amount    Int
   purpose   String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt
+  status    WalletFlowStatus @default(PENDING)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt
 }
 
 model Support {
@@ -192,4 +216,14 @@ model News {
   updatedAt DateTime @updatedAt
   User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
+}
+
+
+model PaymentMetaData {
+  id            String     @id @default(uuid()) @map("_id")
+  authToken     String   
+  usersTypeTag  UserRole   @default(USER)
+  createdAt     DateTime   @default(now()) @map("created_at") 
+  updatedAt     DateTime   @updatedAt 
+  expiry        DateTime   
 }

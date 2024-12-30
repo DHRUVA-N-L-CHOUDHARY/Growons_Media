@@ -79,6 +79,7 @@ const FormInvoice = ({ id, userId }: InvoiceProps) => {
               onClick: () => console.log("Undo"),
             },
           });
+          form.reset();
         }
         if (data?.error) {
           toast.error(data.error, {

@@ -44,6 +44,45 @@ export const addOrder = async (values: z.infer<typeof OrderSchema>) => {
     return { error: "You have been blocked contact admin to know more" };
   }
 
+  const walletFlow = await db.walletFlow.findMany({
+    where: {
+      userId: id,
+    },
+  });
+
+  const calculateTotalMoney = walletFlow.reduce((acc, flow) => {
+    const amount =
+      flow.purpose?.toLowerCase() === "wallet recharge"
+        ? flow.status === "SUCCESS"
+          ? Math.abs(flow.amount)
+          : 0
+        : flow.purpose?.toLowerCase() === "admin"
+        ? flow.status === "SUCCESS"
+          ? Math.abs(flow.amount)
+          : 0
+        : flow.status === "SUCCESS" || flow.status === "PENDING"
+        ? -Math.abs(flow.amount)
+        : 0;
+
+    return acc + amount;
+  }, 0);
+
+  const isAmountMatching = calculateTotalMoney === user?.totalMoney;
+
+  if (!isAmountMatching) {
+    await db.user.update({
+      where: { id: id },
+      data: {
+        role: "BLOCKED",
+        totalMoney: calculateTotalMoney,
+      },
+    });
+
+    return {
+      error: "You have been blocked by the admin. contact admin know more",
+    };
+  }
+
   const errors: ProductError[] = [];
 
   const allProducts = products.map((product) => {
@@ -230,6 +269,7 @@ export const addOrder = async (values: z.infer<typeof OrderSchema>) => {
           moneyId: orderId.toString().slice(-10),
           purpose: "Order placed",
           userId: id,
+          status: "PENDING",
         },
       });
 

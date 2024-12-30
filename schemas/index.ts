@@ -62,6 +62,7 @@ export const EditUserSchema = z.object({
     })
     .toLowerCase()
     .optional(),
+  paymentType: z.string().toUpperCase().optional(),
   number: z
     .string()
     .min(10, {
@@ -191,6 +192,15 @@ export const MoneySchema = z.object({
     })
     .pipe(z.custom<File>()),
 });
+export const PaymentSchema = z.object({
+  amount: z.coerce.number().min(1, {
+    message: "Amount must be greater than 0",
+  }),
+});
+
+export const UpiFormSchema = z.object({
+  upiId: z.string().min(1, "UPI ID is required"),
+});
 
 export const WithdrawMoneySchema = z.object({
   accountNumber: z
@@ -266,7 +276,6 @@ export const AcceptWithdrawalSchema = z.object({
 });
 
 export const RejectWithdrawalSchema = z.object({
-  id: z.string(),
   reason: z.string().min(10, { message: "Minimum of 10 characters required" }),
 });
 
@@ -463,6 +472,7 @@ export const FeedbackFileSchema = z.object({
 
 export const AcceptOrderSchema = z.object({
   id: z.string(),
+  orderId: z.string(),
   files: z
     .array(
       z
@@ -501,6 +511,7 @@ export const RejectOrderSchema = z.object({
   id: z.string(),
   reason: z.string().min(10, { message: "Minimum of 10 characters required" }),
   userId: z.string(),
+  orderId: z.string(),
   amount: z.coerce.number(),
 });
 
@@ -658,4 +669,14 @@ export const AddSupportLinkForm = z.object({
   link: z.string().includes("https://").min(1, {
     message: "Please enter the support link",
   }),
+});
+
+export const ManagePaymentModeSchema = z.object({
+  userId: z.string(),
+  paymentType: z.string().toUpperCase().optional(),
+});
+
+export const AutomationStateSchema = z.object({
+  newState: z.boolean(),
+  userId: z.string().nonempty("User ID is required"),
 });

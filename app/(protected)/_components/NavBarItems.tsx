@@ -136,6 +136,7 @@ export const AdminSidebar = () => {
         </li>
         <AdminProducts />
         <AdminAnalytics />
+        <SupportPolicies />
         {/* <ProSidebar /> */}
       </ul>
     </>
@@ -196,6 +197,81 @@ const AdminProducts = () => {
             className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
           >
             Feedbacks
+          </Link>
+        </li>
+      </ul>
+    </>
+  );
+};
+
+export const SupportPolicies = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+  return (
+    <>
+      <button
+        type="button"
+        className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100"
+        onClick={toggleDropdown}
+      >
+        <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
+          Support & Policies
+        </span>
+        <svg
+          className="w-3 h-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m1 1 4 4 4-4"
+          />
+        </svg>
+      </button>
+      <ul className={`${isDropdownOpen ? "block" : "hidden"} py-2 space-y-2`}>
+        <li>
+          <Link
+            href={`/support_policies/privacy_policy`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Privacy Policy
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/support_policies/refund_policy`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Refund Policy
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/support_policies/terms_conditions`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Terms & Conditions
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/support_policies/about_us`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            About Us
+          </Link>
+          <Link
+            href={`/support_policies/contact_us`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Contact Us
           </Link>
         </li>
       </ul>
