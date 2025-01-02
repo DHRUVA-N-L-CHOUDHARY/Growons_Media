@@ -131,13 +131,14 @@ export const createPaymentRequest = async (formData: FormData) => {
       return { error: "Failed to create payment request. Please try again." };
     }
 
-    const { intent, gpay, paytm, phonePe, dynamicQR, merchantReferenceId } =
+    const { intent, gpay, paytm, phonePe, dynamicQR, merchantReferenceId , expiry } =
       paymentResponse.data;
 
     return {
       success: "Payment request created. Please complete the payment.",
       paymentLinks: { intent, gpay, paytm, phonePe, dynamicQR },
       merchantReferenceId: merchantReferenceId,
+      expiry : expiry
     };
   } catch (error: any) {
     console.error("Error:", error.message);
