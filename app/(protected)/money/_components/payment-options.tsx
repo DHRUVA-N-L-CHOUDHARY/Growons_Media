@@ -120,7 +120,10 @@ const PaymentGateway = ({
           toast.success(data?.success);
           window.location.reload();
         }
-        
+        else if(data?.error){
+          console.error(data?.error);
+          toast.error(data?.error);
+        }
       });
     } catch (error) {
       console.error(error);
@@ -213,7 +216,7 @@ const PaymentGateway = ({
                       {isCheckStatusEnabled && (
                         <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
                           <p className="text-sm font-semibold">
-                          Please wait 40 seconds after payment for processing and wallet credit. Thank you!
+                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
                           </p>
                         </div>
                       )}
@@ -290,7 +293,7 @@ const PaymentGateway = ({
                     {isCheckStatusEnabled && (
                         <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
                           <p className="text-sm font-semibold">
-                          Please wait 40 seconds after payment for processing and wallet credit. Thank you!
+                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
                           </p>
                         </div>
                       )}
