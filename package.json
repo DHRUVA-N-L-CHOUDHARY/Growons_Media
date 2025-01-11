@@ -28,6 +28,7 @@
     "cloudinary": "^2.0.2",
     "clsx": "^2.0.0",
     "date-fns": "^4.1.0",
+    "firebase-admin": "^13.0.2",
     "googleapis": "^144.0.0",
     "json2csv": "^6.0.0-alpha.2",
     "lucide-react": "^0.344.0",

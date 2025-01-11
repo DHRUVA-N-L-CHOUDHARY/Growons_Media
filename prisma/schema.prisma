@@ -113,6 +113,9 @@ model Money {
   public_id     String      @unique
   secure_url    String
   reason        String?
+  paymentProces Boolean     @default(false)
+  paymentMode   PaymentType 
+  counter       Int         @default(0)
   status        MoneyStatus @default(PENDING)
   User          User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String

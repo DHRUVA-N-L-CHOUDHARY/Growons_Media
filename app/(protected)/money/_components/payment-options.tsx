@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaQrcode, FaAt } from "react-icons/fa";
 import DynamicQRCode from "./dynamic-qr";
 import EnterUpiId from "./upi-id-form";
@@ -60,6 +60,11 @@ const PaymentGateway = ({
   );
   const [isCheckStatusEnabled, setIsCheckStatusEnabled] = useState(false);
 
+  const [expiryTime, setExpiryTime] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  const calculateTimeLimit = (expiry: string) => new Date(expiry);
+
   const form = useForm<z.infer<typeof PaymentSchema>>({
     resolver: zodResolver(PaymentSchema),
     defaultValues: {
@@ -77,6 +82,7 @@ const PaymentGateway = ({
         if (data?.success) {
           const paymentLinks = data.paymentLinks;
           const merchantReferenceId = data.merchantReferenceId;
+          const expiry = data.expiry;
           setMerchantReferenceId(merchantReferenceId);
           setPaymentLinks({
             intent: paymentLinks?.intent,
@@ -84,6 +90,7 @@ const PaymentGateway = ({
             paytm: paymentLinks?.paytm,
             dynamicQR: paymentLinks?.dynamicQR,
           });
+          setExpiryTime(calculateTimeLimit(expiry));
           setIsCheckStatusEnabled(true);
           toast.success(data?.success);
         }
@@ -99,7 +106,7 @@ const PaymentGateway = ({
     }
   };
 
-  const checPaymentStatus = async () => {
+  const checPaymentStatus = useCallback(async () => {
     if (!merchantReferenceId) {
       toast.error("No reference ID available to check the status.");
       return;
@@ -113,7 +120,8 @@ const PaymentGateway = ({
           toast.success(data?.success);
           window.location.reload();
         }
-        if (data?.error) {
+        else if(data?.error){
+          console.error(data?.error);
           toast.error(data?.error);
         }
       });
@@ -123,7 +131,48 @@ const PaymentGateway = ({
     } finally {
       setIsPending(false);
     }
-  };
+  }, [merchantReferenceId, userId]);
+
+  const startPeriodicCheck = useCallback(async () => {
+    const endTime = expiryTime || new Date(Date.now() + 4 * 60 * 1000);
+    while (isCheckStatusEnabled && new Date() < endTime) {
+      try {
+        await checPaymentStatus();
+      } catch (error) {
+        console.error("Error in periodic check:", error);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 30000));
+    }
+  }, [isCheckStatusEnabled, expiryTime, checPaymentStatus]);
+
+  useEffect(() => {
+    if (isCheckStatusEnabled) {
+      startPeriodicCheck();
+    }
+  }, [isCheckStatusEnabled, startPeriodicCheck]);
+
+  useEffect(() => {
+    if (!expiryTime) return;
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const diff = expiryTime.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        clearInterval(timer);
+        setTimeLeft("Time Expired");
+        setIsCheckStatusEnabled(false);
+        toast.error("Payment Request Timed Out!");
+        window.location.reload();
+      } else {
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        setTimeLeft(`${minutes}m ${seconds}s`);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiryTime]);
 
   const paymentOptions = [
     {
@@ -164,6 +213,13 @@ const PaymentGateway = ({
                     className="space-y-3 my-2 md:mt-10"
                   >
                     <div className="space-y-2 p-2">
+                      {isCheckStatusEnabled && (
+                        <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
+                          <p className="text-sm font-semibold">
+                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
+                          </p>
+                        </div>
+                      )}
                       <FormField
                         control={form.control}
                         name="amount"
@@ -196,12 +252,21 @@ const PaymentGateway = ({
             </div>
             {isCheckStatusEnabled && (
               <div className="md:w-[50%]">
+                {expiryTime && (
+                  <div className="mx-6 mb-6 mt-4 flex justify-end items-center">
+                    <div className="p-3 bg-secondary text-secondary-foreground rounded-lg shadow-lg border border-primary flex items-center space-x-2">
+                      <p className="text-sm font-bold">Time Remaining:</p>
+                      <p className="text-lg font-semibold">{timeLeft}</p>
+                    </div>
+                  </div>
+                )}
+
                 <DesktopPaymentGateway
                   dynamicQRLink={paymentLinks.dynamicQR}
                   userId={userId}
                 />
 
-                <div className="mt-4 max-w-lg mx-10">
+                {/* <div className="mt-4 max-w-lg mx-10">
                   <Button
                     onClick={checPaymentStatus}
                     disabled={isPending}
@@ -209,7 +274,7 @@ const PaymentGateway = ({
                   >
                     Check Payment Status
                   </Button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
@@ -225,6 +290,13 @@ const PaymentGateway = ({
                     className="space-y-3 my-2 md:mt-10"
                   >
                     <div className="space-y-2 p-2">
+                    {isCheckStatusEnabled && (
+                        <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
+                          <p className="text-sm font-semibold">
+                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
+                          </p>
+                        </div>
+                      )}
                       <FormField
                         control={form.control}
                         name="amount"
@@ -255,13 +327,22 @@ const PaymentGateway = ({
                 </Form>
               </section>
             </div>
-            {isCheckStatusEnabled  && (
+            {isCheckStatusEnabled && (
               <div className="md:w-[50%]">
+                {expiryTime && (
+                  <div className="mx-6 my-6 flex justify-center items-center">
+                    <div className="p-3 bg-secondary text-secondary-foreground rounded-lg shadow-lg border border-primary flex items-center space-x-2">
+                      <p className="text-sm font-bold">Time Remaining:</p>
+                      <p className="text-lg font-semibold">{timeLeft}</p>
+                    </div>
+                  </div>
+                )}
+
                 <MobilePaymentGateway
                   paymentOptions={paymentOptions}
                   userId={userId}
                 />
-                <div className="mt-4 max-w-lg md:mx-10">
+                {/* <div className="mt-4 max-w-lg md:mx-10">
                   <Button
                     onClick={checPaymentStatus}
                     disabled={isPending}
@@ -269,7 +350,7 @@ const PaymentGateway = ({
                   >
                     Check Payment Status
                   </Button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
@@ -318,7 +399,7 @@ const MobilePaymentGateway = ({
             </div>
           )}
         </div>
-        <div className="w-full border border-border rounded-lg overflow-hidden">
+        {/* <div className="w-full border border-border rounded-lg overflow-hidden">
           <div
             className={`bg-secondary text-secondary-foreground p-4 cursor-pointer font-semibold hover:bg-secondary-foreground hover:text-secondary transition flex items-center gap-2"`}
             onClick={() =>
@@ -333,7 +414,7 @@ const MobilePaymentGateway = ({
               <EnterUpiId userId={userId} />
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -372,7 +453,7 @@ const DesktopPaymentGateway = ({
           )}
         </div>
 
-        <div className="w-full max-w-lg border border-border rounded-lg overflow-hidden mx-10">
+        {/* <div className="w-full max-w-lg border border-border rounded-lg overflow-hidden mx-10">
           <div
             className="bg-secondary text-secondary-foreground p-4 cursor-pointer font-semibold hover:bg-secondary-foreground hover:text-secondary transition flex items-center gap-2"
             onClick={() =>
@@ -383,7 +464,7 @@ const DesktopPaymentGateway = ({
             Enter UPI ID
           </div>
           {expandedSection === "upi" && <EnterUpiId userId={userId} />}
-        </div>
+        </div> */}
       </div>
     </div>
   );
