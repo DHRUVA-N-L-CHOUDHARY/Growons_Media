@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import {
   modifyPaymentMode,
-  refreshMerchantToken,
+  refereshMerchantToken,
 } from "@/actions/admin-manage-payment-mode";
 
 const ManagePaymentModeForm = ({ userId }: { userId: string }) => {
@@ -67,7 +67,7 @@ const ManagePaymentModeForm = ({ userId }: { userId: string }) => {
   const handleRefreshToken = async () => {
     setIsRefreshing(true);
     try {
-      const result = await refreshMerchantToken();
+      const result = await refereshMerchantToken();
       if (result.error) {
         toast.error(result.error);
       } else {
