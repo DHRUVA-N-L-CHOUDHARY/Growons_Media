@@ -99,7 +99,6 @@ export const AddMoney = async (formData: FormData) => {
         error: "You have been blocked by the admin. contact admin know more",
       };
     }
-
     await db.money.create({
       data: {
         amount: formData.get("amount")?.toString(),
@@ -108,9 +107,6 @@ export const AddMoney = async (formData: FormData) => {
         transactionId: formData.get("transactionId")?.toString() ?? "",
         upiid: formData.get("upiid")?.toString() ?? "",
         accountNumber: formData.get("accountNumber")?.toString(),
-        paymentMode:
-          user.paymentType === "MANUAL" ? "MANUAL" : "PAYMENT_GATEWAY",
-        paymentProces: false,
         userId: userId,
         name: username ?? "",
       },

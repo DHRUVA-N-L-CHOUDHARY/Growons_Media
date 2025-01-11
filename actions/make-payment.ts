@@ -131,48 +131,14 @@ export const createPaymentRequest = async (formData: FormData) => {
       return { error: "Failed to create payment request. Please try again." };
     }
 
-    const {
-      intent,
-      gpay,
-      paytm,
-      phonePe,
-      dynamicQR,
-      merchantReferenceId,
-      expiry,
-    } = paymentResponse.data;
-
-    await db.money.create({
-      data: {
-        amount,
-        secure_url: "https://img.icons8.com/ios/50/invoice.png",
-        public_id: generateSpecialCharacterString(10),
-        transactionId: merchantReferenceId,
-        upiid: formData.get("upiid")?.toString() || "",
-        accountNumber: formData.get("accountNumber")?.toString() || "",
-        userId,
-        paymentMode:
-          user.paymentType === "MANUAL" ? "MANUAL" : "PAYMENT_GATEWAY",
-        paymentProces: false,
-        name: user.name || "",
-        status: "PENDING",
-      },
-    });
-
-    await db.walletFlow.create({
-      data: {
-        amount: Number(amount),
-        moneyId: merchantReferenceId,
-        purpose: "Wallet recharge",
-        userId,
-        status: "PENDING",
-      },
-    });
+    const { intent, gpay, paytm, phonePe, dynamicQR, merchantReferenceId , expiry } =
+      paymentResponse.data;
 
     return {
       success: "Payment request created. Please complete the payment.",
       paymentLinks: { intent, gpay, paytm, phonePe, dynamicQR },
       merchantReferenceId: merchantReferenceId,
-      expiry: expiry,
+      expiry : expiry
     };
   } catch (error: any) {
     console.error("Error:", error.message);
@@ -249,33 +215,6 @@ export const createCollectRequest = async (formData: FormData) => {
     const { expiry, merchantReferenceId } = paymentResponse.data;
     console.log(merchantReferenceId);
 
-    await db.money.create({
-      data: {
-        amount,
-        secure_url: "https://img.icons8.com/ios/50/invoice.png",
-        public_id: generateSpecialCharacterString(10),
-        transactionId: merchantReferenceId,
-        upiid: formData.get("upiid")?.toString() || "",
-        accountNumber: formData.get("accountNumber")?.toString() || "",
-        userId,
-        paymentMode:
-          user.paymentType === "MANUAL" ? "MANUAL" : "PAYMENT_GATEWAY",
-        paymentProces: false,
-        name: user.name || "",
-        status: "PENDING",
-      },
-    });
-
-    await db.walletFlow.create({
-      data: {
-        amount: Number(amount),
-        moneyId: merchantReferenceId,
-        purpose: "Wallet recharge",
-        userId,
-        status: "PENDING",
-      },
-    });
-
     return {
       success: "Collect request created successfully.",
       details: { expiry, merchantReferenceId },
@@ -291,95 +230,78 @@ export const checkPaymentStatus = async (
   userId: string
 ) => {
   try {
-    const moneyRecord = await db.money.findFirst({
-      where: { transactionId: merchantReferenceId },
+    const requestPayload = {
+      mid: "GROWONSMED",
+      merchantReferenceId,
+    };
+
+    const currentDate = new Date();
+    const paymentMetadata = await db.paymentMetaData.findFirst({
+      where: {
+        expiry: { gt: currentDate },
+      },
+      orderBy: { createdAt: "asc" },
     });
 
-    if (
-      moneyRecord?.paymentProces === false &&
-      moneyRecord?.status != "SUCCESS"
-    ) {
-      const requestPayload = {
-        mid: "GROWONSMED",
-        merchantReferenceId,
-      };
+    const token =
+      paymentMetadata?.authToken ||
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaWQiOiJHUk9XT05TTUVEIiwiX2lkIjoiNjc2MWFkNmI2MzQyYzRmYjUyZTAzNWM5IiwiaWF0IjoxNzM0OTI2NzI0LCJleHAiOjE3Mzc1MTg3MjR9.YggJxjig6BVg3-euCnuNIPUhmqY7CE2YKC9JxgT446g";
 
-      const currentDate = new Date();
-      const paymentMetadata = await db.paymentMetaData.findFirst({
-        where: {
-          expiry: { gt: currentDate },
+    const response = await axios.post(
+      "https://server.paygic.in/api/v2/checkPaymentStatus",
+      requestPayload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token:
+            token ||
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaWQiOiJHUk9XT05TTUVEIiwiX2lkIjoiNjc2MWFkNmI2MzQyYzRmYjUyZTAzNWM5IiwiaWF0IjoxNzM0OTI2NzI0LCJleHAiOjE3Mzc1MTg3MjR9.YggJxjig6BVg3-euCnuNIPUhmqY7CE2YKC9JxgT446g",
         },
-        orderBy: { createdAt: "asc" },
+      }
+    );
+
+    const { status, statusCode, txnStatus, msg, data } = response.data;
+
+    console.log(status);
+    console.log(statusCode);
+
+    if (!status || statusCode !== 200) {
+      if (statusCode === 300) {
+        return { error: "Transaction not found. Please check the details." };
+      }
+      return { error: msg || "Failed to check payment status." };
+    }
+
+    if (txnStatus === "SUCCESS") {
+      const bankDetails = await db.bankDetails.findFirst({
+        orderBy: { createdAt: "desc" },
       });
 
-      const token =
-        paymentMetadata?.authToken ||
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaWQiOiJHUk9XT05TTUVEIiwiX2lkIjoiNjc2MWFkNmI2MzQyYzRmYjUyZTAzNWM5IiwiaWF0IjoxNzM0OTI2NzI0LCJleHAiOjE3Mzc1MTg3MjR9.YggJxjig6BVg3-euCnuNIPUhmqY7CE2YKC9JxgT446g";
-
-      const response = await axios.post(
-        "https://server.paygic.in/api/v2/checkPaymentStatus",
-        requestPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            token:
-              token ||
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtaWQiOiJHUk9XT05TTUVEIiwiX2lkIjoiNjc2MWFkNmI2MzQyYzRmYjUyZTAzNWM5IiwiaWF0IjoxNzM0OTI2NzI0LCJleHAiOjE3Mzc1MTg3MjR9.YggJxjig6BVg3-euCnuNIPUhmqY7CE2YKC9JxgT446g",
-          },
-        }
-      );
-
-      const { status, statusCode, txnStatus, msg, data } = response.data;
-
-      console.log(status);
-      console.log(statusCode);
-
-      if (statusCode !== 200) {
-        if (statusCode === 300) {
-          return { error: "Transaction not found. Please check the details." };
-        }
-        return { error: msg || "Failed to check payment status." };
+      if (!bankDetails) {
+        return {
+          error: "Bank details not found for processing the transaction.",
+        };
       }
 
-      if (txnStatus === "SUCCESS") {
-        const bankDetails = await db.bankDetails.findFirst({
-          orderBy: { createdAt: "desc" },
-        });
+      const formData = new FormData();
+      formData.set("transactionId", data?.UTR || "");
+      formData.set("amount", data?.amount?.toString() || "0");
+      formData.set("userId", userId);
+      formData.set("upiid", bankDetails?.upiid || "");
+      formData.append("accountNumber", bankDetails?.accountDetails || "");
 
-        if (!bankDetails) {
-          return {
-            error: "Bank details not found for processing the transaction.",
-          };
-        }
+      const addMoneyResult = await AddMoney(formData);
 
-        const formData = new FormData();
-        formData.set("transactionId", data?.UTR || "");
-        formData.set("amount", data?.amount?.toString() || "0");
-        formData.set("userId", userId);
-        formData.set("upiid", bankDetails?.upiid || "");
-        formData.append("accountNumber", bankDetails?.accountDetails || "");
-        formData.set("merchantReferenceId", merchantReferenceId);
-
-        const addMoneyResult = await AddMoney(formData);
-
-        if (addMoneyResult.error) {
-          return { error: addMoneyResult.error };
-        }
-
-        revalidatePath("/money/record");
-        return { success: "Transaction successful and money added!" };
-      } else if (txnStatus === "REJECT") {
-        return { error: "Transaction rejected. Please try again." };
-      } else {
-        return { error: "Transaction is pending. Waiting for your payment." };
+      if (addMoneyResult.error) {
+        return { error: addMoneyResult.error };
       }
-    } else if (moneyRecord?.status === "SUCCESS") {
-      return { success: "Money added successfully!" };
+
+      revalidatePath("/money/record");
+      return { success: "Transaction successful and money added!" };
+    } else if (txnStatus === "REJECT") {
+      return { error: "Transaction rejected. Please try again." };
     } else {
-      return {
-        error:
-          "Transaction failed. Please try again after 5 minutes or contact admin.",
-      };
+      return { error: "Transaction failed or is pending." };
     }
   } catch (error: any) {
     console.error("Error during payment status check:", error.message);
@@ -391,7 +313,6 @@ export const AddMoney = async (formData: FormData) => {
   const transactionId = formData.get("transactionId")?.toString() || "";
   const userId = formData.get("userId")?.toString();
   const amount = formData.get("amount")?.toString();
-  const merchantReferenceId = formData.get("merchantReferenceId")?.toString();
 
   if (!userId || !transactionId || !amount) {
     return { error: "Invalid form data provided." };
@@ -410,7 +331,7 @@ export const AddMoney = async (formData: FormData) => {
 
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { totalMoney: true, name: true, paymentType: true },
+      select: { totalMoney: true, name: true },
     });
 
     if (!user) {
@@ -419,22 +340,34 @@ export const AddMoney = async (formData: FormData) => {
 
     const totalMoney = Number(user.totalMoney);
 
+    // Update user's total money
     await db.user.update({
       where: { id: userId },
       data: { totalMoney: totalMoney + updatedMoney },
     });
 
-    await db.walletFlow.update({
-      where: { moneyId: merchantReferenceId },
+    // Create money record
+    await db.money.create({
       data: {
+        amount,
+        secure_url: "https://img.icons8.com/ios/50/invoice.png",
+        public_id: generateSpecialCharacterString(10),
+        transactionId,
+        upiid: formData.get("upiid")?.toString() || "",
+        accountNumber: formData.get("accountNumber")?.toString() || "",
+        userId,
+        name: user.name || "",
         status: "SUCCESS",
       },
     });
 
-    await db.money.update({
-      where: { transactionId: merchantReferenceId },
+    // Create wallet flow record
+    await db.walletFlow.create({
       data: {
-        paymentProces: false,
+        amount: updatedMoney,
+        moneyId: transactionId,
+        purpose: "Wallet recharge",
+        userId,
         status: "SUCCESS",
       },
     });
