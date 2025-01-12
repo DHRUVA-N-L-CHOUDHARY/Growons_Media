@@ -78,6 +78,11 @@ const PaymentGateway = ({
       const paymentRequestData = new FormData();
       paymentRequestData.set("amount", values.amount.toString());
       paymentRequestData.set("userId", userId);
+      paymentRequestData.set("upiid", bankDetails?.upiid ?? "");
+      paymentRequestData.set(
+        "accountNumber",
+        bankDetails?.accountDetails ?? ""
+      );
       await createPaymentRequest(paymentRequestData).then((data) => {
         if (data?.success) {
           const paymentLinks = data.paymentLinks;
@@ -119,8 +124,7 @@ const PaymentGateway = ({
         if (data?.success) {
           toast.success(data?.success);
           window.location.reload();
-        }
-        else if(data?.error){
+        } else if (data?.error) {
           console.error(data?.error);
           toast.error(data?.error);
         }
@@ -216,7 +220,12 @@ const PaymentGateway = ({
                       {isCheckStatusEnabled && (
                         <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
                           <p className="text-sm font-semibold">
-                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
+                            Please stay on this page for 40 seconds after
+                            completing the payment to allow for processing. If
+                            you happen to leave the page, don’t worry! Your
+                            payment will be processed, and the amount will be
+                            credited to your wallet within 20 minutes upon
+                            confirmation. Thank you!
                           </p>
                         </div>
                       )}
@@ -290,10 +299,15 @@ const PaymentGateway = ({
                     className="space-y-3 my-2 md:mt-10"
                   >
                     <div className="space-y-2 p-2">
-                    {isCheckStatusEnabled && (
+                      {isCheckStatusEnabled && (
                         <div className="p-3 bg-yellow-100 text-yellow-900 border-l-4 border-yellow-500 rounded-md shadow">
                           <p className="text-sm font-semibold">
-                          Please stay on this page for 40 seconds after completing the payment to allow for processing. If you happen to leave the page, don’t worry! Your payment will be processed, and the amount will be credited to your wallet within 20 minutes upon confirmation. Thank you!
+                            Please stay on this page for 40 seconds after
+                            completing the payment to allow for processing. If
+                            you happen to leave the page, don’t worry! Your
+                            payment will be processed, and the amount will be
+                            credited to your wallet within 20 minutes upon
+                            confirmation. Thank you!
                           </p>
                         </div>
                       )}
