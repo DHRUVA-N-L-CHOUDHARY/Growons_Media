@@ -209,8 +209,7 @@ export const WithdrawMoneySchema = z.object({
     .min(8, "Account Number must be at least 8 characters"),
   ifscCode: z
     .string()
-    .nonempty("IFSC Code is required")
-    .regex(/^[A-Za-z]{4}\d{7}$/, "Invalid IFSC Code format"),
+    .nonempty("IFSC Code is required"),
   beneficiaryName: z
     .string()
     .nonempty("Beneficiary Name is required")
