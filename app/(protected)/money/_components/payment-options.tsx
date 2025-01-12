@@ -73,6 +73,11 @@ const PaymentGateway = ({
       const paymentRequestData = new FormData();
       paymentRequestData.set("amount", values.amount.toString());
       paymentRequestData.set("userId", userId);
+      paymentRequestData.set("upiid", bankDetails?.upiid ?? "");
+      paymentRequestData.set(
+        "accountNumber",
+        bankDetails?.accountDetails ?? ""
+      );
       await createPaymentRequest(paymentRequestData).then((data) => {
         if (data?.success) {
           const paymentLinks = data.paymentLinks;
