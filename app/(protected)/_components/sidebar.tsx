@@ -19,15 +19,15 @@ const Sidebar = () => {
             className="flex items-center p-2 text-gray-900 rounded-lg"
           >
             <div className="w-64 h-20">
-              {/* <Image
-                src={"/svgs/logo.webp"}
+              <Image
+                src={"/svgs/logo.png"}
                 alt="GrowonsMedia"
                 width={150}
                 height={10}
                 priority
                 quality={100}
                 className="w-full h-full object-contain"
-              /> */}
+              />
             </div>
           </Link>
           <NavItems />
