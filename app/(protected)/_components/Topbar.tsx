@@ -24,7 +24,7 @@ const TopBar = async ({ title }: { title: string }) => {
         <h1 className="text-nowrap text-xl">{title}</h1>
       </div>
       <div className="flex items-center justify-end">
-        {session?.user.role !== "ADMIN" && (
+        {(session?.user.role === "USER" || session?.user.role === "BLOCKED" || session?.user.role === "PRO") && (
           <div className="flex items-center mr-2">
             <Image
               src={"/svgs/coin.svg"}

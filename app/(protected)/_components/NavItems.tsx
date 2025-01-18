@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { AdminSidebar, SidebarItems, SupportPolicies } from "./NavBarItems";
+import { AdminSidebar, PartialAdminSidebar, SidebarItems, SupportPolicies } from "./NavBarItems";
 import { auth } from "@/auth";
 
 const NavItems = async () => {
@@ -15,7 +15,7 @@ const NavItems = async () => {
           <span className="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
         </Link>
       </li>
-      {session?.user.role === "ADMIN" ? (
+      {session?.user.role === "ADMIN" || session?.user.role === "PARTIALADMIN" ? (
         <></>
       ) : (
         <>
@@ -79,6 +79,7 @@ const NavItems = async () => {
           <SupportPolicies />
         </>
       )}
+      {session?.user.role === "PARTIALADMIN" && <PartialAdminSidebar />}
       {session?.user.role === "ADMIN" && <AdminSidebar />}
     </ul>
   );

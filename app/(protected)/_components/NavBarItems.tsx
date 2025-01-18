@@ -142,6 +142,46 @@ export const AdminSidebar = () => {
     </>
   );
 };
+export const PartialAdminSidebar = () => {
+  return (
+    <>
+      <ul className={`space-y-2 font-medium`}>
+        <li>
+          <Link
+            href={`/partial-admin/user`}
+            className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 "
+          >
+            <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/partial-admin/wallet/history`}
+            className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 "
+          >
+            <span className="flex-1 ms-3 whitespace-nowrap">
+              Invoices history
+            </span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/partial-admin/orders/history`}
+            className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 "
+          >
+            <span className="flex-1 ms-3 whitespace-nowrap">
+              Orders history
+            </span>
+          </Link>
+        </li>
+        {/* <AdminProducts /> */}
+        <PartialAdminAnalytics />
+        {/* <SupportPolicies /> */}
+        {/* <ProSidebar /> */}
+      </ul>
+    </>
+  );
+};
 
 const AdminProducts = () => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -279,6 +319,66 @@ export const SupportPolicies = () => {
   );
 };
 
+const PartialAdminAnalytics = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+  return (
+    <>
+      <button
+        type="button"
+        className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100"
+        onClick={toggleDropdown}
+      >
+        <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
+          Analytics
+        </span>
+        <svg
+          className="w-3 h-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m1 1 4 4 4-4"
+          />
+        </svg>
+      </button>
+      <ul className={`${isDropdownOpen ? "block" : "hidden"} py-2 space-y-2`}>
+        <li>
+          <Link
+            href={`/partial-admin/analytics/user `}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            User
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/partial-admin/analytics/wallet`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Wallet
+          </Link>
+        </li>
+        <li>
+          <Link
+            href={`/partial-admin/analytics/product`}
+            className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100"
+          >
+            Product
+          </Link>
+        </li>
+      </ul>
+    </>
+  );
+};
 const AdminAnalytics = () => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const toggleDropdown = () => {

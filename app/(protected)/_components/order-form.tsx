@@ -31,7 +31,7 @@ type FormValues = z.infer<typeof OrderSchema>;
 type OrderProps = {
   id: string;
   products: any;
-  role: "PRO" | "BLOCKED" | "USER" | "ADMIN" | undefined;
+  role: "PRO" | "BLOCKED" | "USER" | "ADMIN" | "PARTIALADMIN" | undefined;
 
   children: React.ReactNode;
 };
