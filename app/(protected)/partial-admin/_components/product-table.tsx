@@ -51,7 +51,7 @@ const ProductTable = async ({
     take: pageSize,
   });
 
-  revalidatePath("/admin/product");
+  revalidatePath("/partial-admin/product");
 
   return (
     <>

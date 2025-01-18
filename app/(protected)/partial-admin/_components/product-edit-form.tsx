@@ -64,7 +64,7 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({ product }) => {
         }
 
         if (data.success) {
-          router.push("/admin/product/product-table");
+          router.push("/partial-admin/product/product-table");
         }
       });
     });
