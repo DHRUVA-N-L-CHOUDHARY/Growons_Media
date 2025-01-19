@@ -86,7 +86,7 @@ export async function MoneyTable({ userId, searchParams }: TableProps) {
                   <ImageDialog
                     imageLink={
                       invoice.secure_url === "PayGIC Payment Gateway"
-                        ? "/svgs/logo.webp"
+                        ? "/svgs/logo.png"
                         : invoice.secure_url
                     }
                   />

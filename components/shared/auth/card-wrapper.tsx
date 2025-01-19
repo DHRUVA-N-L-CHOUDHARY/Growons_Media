@@ -36,15 +36,15 @@ const CardWrapper = ({
       <CardHeader>
         <div className="flex flex-col gap-y-2 items-center justify-center">
           <div className="w-64 h-20">
-            {/* <Image
-              src={"/svgs/logo.webp"}
+            <Image
+              src={"/svgs/logo.png"}
               alt="GrowonsMedia"
               width={150}
               height={10}
               priority
               quality={100}
               className="w-full h-full object-contain"
-            /> */}
+            />
           </div>
           <p className="text-muted-foreground text-md">{headerLabel}</p>
           <p className=" text-muted-foreground text-sm">Leads panel</p>
