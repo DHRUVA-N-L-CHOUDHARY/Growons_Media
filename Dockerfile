@@ -1,5 +1,5 @@
-# Use the official Node.js 18 image as the base
-FROM node:18-alpine as builder
+# Use the official Node.js 20 image as the base
+FROM node:20-alpine as builder
 
 # Install OpenSSL and other build dependencies
 RUN apk add --no-cache openssl python3 make g++
@@ -25,7 +25,7 @@ RUN npm run build
 # ---
 
 # Use a lightweight Node.js runtime image for production
-FROM node:18-alpine as runner
+FROM node:20-alpine as runner
 
 # Install OpenSSL (required for Prisma)
 RUN apk add --no-cache openssl

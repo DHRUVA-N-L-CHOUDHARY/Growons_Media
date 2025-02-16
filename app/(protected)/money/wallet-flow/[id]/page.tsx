@@ -26,7 +26,7 @@ const WalletFlow = async ({
     await db.walletFlow.findMany({
       where: {
         userId: params.id,
-        status: "SUCCESS",
+        status : "SUCCESS"
       },
     })
   ).length;

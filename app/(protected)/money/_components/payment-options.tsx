@@ -53,6 +53,7 @@ const PaymentGateway = ({
     intent: "",
     gpay: "",
     paytm: "",
+    phonePe: "",
     dynamicQR: "",
   });
   const [merchantReferenceId, setMerchantReferenceId] = useState<string | null>(
@@ -86,6 +87,8 @@ const PaymentGateway = ({
       await createPaymentRequest(paymentRequestData).then((data) => {
         if (data?.success) {
           const paymentLinks = data.paymentLinks;
+          console.log(paymentLinks);
+          ""
           const merchantReferenceId = data.merchantReferenceId;
           const expiry = data.expiry;
           setMerchantReferenceId(merchantReferenceId);
@@ -93,6 +96,7 @@ const PaymentGateway = ({
             intent: paymentLinks?.intent,
             gpay: paymentLinks?.gpay,
             paytm: paymentLinks?.paytm,
+            phonePe: paymentLinks?.phonePe,
             dynamicQR: paymentLinks?.dynamicQR,
           });
           setExpiryTime(calculateTimeLimit(expiry));
@@ -202,6 +206,14 @@ const PaymentGateway = ({
       upiLink:
         paymentLinks?.intent ||
         "upi://pay?pa=example@bhim&pn=MerchantName&am=100&cu=INR",
+    },
+    {
+      src: "/svgs/icons/payment-icons/phonepe.svg",
+      alt: "Phone Pe",
+      label: "Phone Pe",
+      upiLink:
+        paymentLinks?.phonePe ||
+        "phonepe://pay?pa=yespay.gaasgrowonsmed@yesbankltd&pn=M/S GROWONS MEDIA&am=1&tn=ref48908ec8-3774-46b3-95d2-8e6b4e9f483a-1738591751405&tr=PAYGIC1738591755019B900D&mc=7311",
     },
   ];
   return (
