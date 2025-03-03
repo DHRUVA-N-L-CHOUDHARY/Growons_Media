@@ -53,7 +53,7 @@ model User {
   totalMoney        Int                 @default(0)
   role              UserRole            @default(USER)
   createdAt         DateTime            @default(now()) @map("created_at")
-  paymentType       PaymentType         @default(MANUAL)
+  paymentType       PaymentType         @default(PAYMENT_GATEWAY)
   money             Money[]
   withdrawalRequest WithdrawalRequest[]
   Order             Order[]
