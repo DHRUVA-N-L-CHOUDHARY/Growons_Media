@@ -36,18 +36,18 @@ export const addOrder = async (values: z.infer<typeof OrderSchema>) => {
     },
   });
 
-  if(user.totalMoney < price) {
-    return {
-      error: "You don't have enough wallet balance.",
-    };
-  }
-
   const orderId = Date.now() + Math.floor(Math.random() * 100000);
   if (!user) return { error: "User not found" };
   const money = user.totalMoney;
 
   if (!user || user.role === "BLOCKED") {
     return { error: "You have been blocked contact admin to know more" };
+  }
+
+  if(!user || user?.totalMoney < price) {
+    return {
+      error: "You don't have enough wallet balance.",
+    };
   }
 
   const walletFlow = await db.walletFlow.findMany({
