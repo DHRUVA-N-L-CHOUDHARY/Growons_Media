@@ -44,6 +44,12 @@ export const addOrder = async (values: z.infer<typeof OrderSchema>) => {
     return { error: "You have been blocked contact admin to know more" };
   }
 
+  if(!user || user?.totalMoney < price) {
+    return {
+      error: "You don't have enough wallet balance.",
+    };
+  }
+
   const walletFlow = await db.walletFlow.findMany({
     where: {
       userId: id,
