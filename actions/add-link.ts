@@ -24,13 +24,31 @@ export const addLink = async (values: z.infer<typeof AddSupportLinkForm>) => {
   }
 
   try {
-    await db.support.create({
-      data: {
-        link,
+    const supportLinkDetails = await db.support.findFirst({
+      where: {
         userId,
       },
     });
+
+    if (supportLinkDetails === null) {
+      await db.support.create({
+        data: {
+          link,
+          userId,
+        },
+      });
+    } else {
+      await db.support.update({
+        where: {
+          userId: userId,
+        },
+        data: {
+          link,
+        },
+      });
+    }
   } catch (error) {
+    console.log(error);
     return { error: "Something went wrong!" };
   }
 
